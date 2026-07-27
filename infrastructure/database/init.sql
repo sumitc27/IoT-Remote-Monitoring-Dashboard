@@ -65,7 +65,7 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 -- Password: admin123 (bcrypt hash)
 -- =====================
 INSERT INTO users (username, email, password_hash, role)
-VALUES ('admin', 'admin@localhost', '$2b$12$LJ3m4ys3Lk0TSwHjfFv.e.TV1GsXMOG1v/gDe..EDAcP6R4fGznOy', 'admin')
+VALUES ('admin', 'admin@localhost', '$2b$12$Aoxo8rtN/8MxaFbvuWWX8uriV7DJc.HhofM2qiwH8heNlnahcqkpK', 'admin')
 ON CONFLICT (username) DO NOTHING;
 
 SELECT 'IoT Dashboard database initialized successfully' AS status;

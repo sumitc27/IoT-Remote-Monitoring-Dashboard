@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # --- Database ---
-    DATABASE_URL: str = "postgresql+asyncpg://iotdash:iotdash_dev@localhost:5432/iotdash_db"
+    DATABASE_URL: str = "postgresql+asyncpg://iotdash:iotdash_dev@localhost:5433/iotdash_db"
 
     # --- MQTT ---
     MQTT_BROKER_HOST: str = "j18eff7a.ala.asia-southeast1.emqxsl.com"
@@ -36,9 +36,10 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
     model_config = {
-        "env_file": ".env",
+        "env_file": "../.env",
         "env_file_encoding": "utf-8",
         "case_sensitive": True,
+        "extra": "ignore",
     }
 
 
