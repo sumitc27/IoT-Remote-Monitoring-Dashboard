@@ -13,7 +13,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.device import Device
 from app.models.telemetry import Telemetry
+from app.models.user import User
 from app.schemas.telemetry import TelemetryResponse
+from app.utils.deps import get_current_user
 
 router = APIRouter(prefix="/api/devices", tags=["Telemetry"])
 
@@ -25,6 +27,7 @@ async def get_device_telemetry(
     to_time: Optional[datetime] = Query(None, alias="to", description="End time (ISO 8601)"),
     limit: int = Query(1000, ge=1, le=10000, description="Max records to return"),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Query historical telemetry for a specific device.
@@ -63,6 +66,7 @@ async def get_device_telemetry(
 async def get_latest_telemetry(
     device_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get the most recent telemetry reading for a device."""
     # Verify device exists

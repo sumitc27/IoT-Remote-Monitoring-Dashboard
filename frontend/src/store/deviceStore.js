@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import api from '../utils/api';
 
 export const useDeviceStore = create((set, get) => ({
   devices: [],
@@ -13,11 +14,8 @@ export const useDeviceStore = create((set, get) => ({
   fetchDevices: async () => {
     set({ isLoading: true });
     try {
-      // In development, you would proxy to backend
-      const res = await fetch('http://localhost:8000/api/devices');
-      if (!res.ok) throw new Error('Failed to fetch devices');
-      const data = await res.json();
-      set({ devices: data, isLoading: false });
+      const res = await api.get('/devices');
+      set({ devices: res.data, isLoading: false });
     } catch (err) {
       set({ error: err.message, isLoading: false });
     }
@@ -26,10 +24,8 @@ export const useDeviceStore = create((set, get) => ({
   fetchDevice: async (id) => {
     set({ isLoading: true });
     try {
-      const res = await fetch(`http://localhost:8000/api/devices/${id}`);
-      if (!res.ok) throw new Error('Failed to fetch device');
-      const data = await res.json();
-      set({ currentDevice: data, isLoading: false });
+      const res = await api.get(`/devices/${id}`);
+      set({ currentDevice: res.data, isLoading: false });
     } catch (err) {
       set({ error: err.message, isLoading: false });
     }
@@ -37,12 +33,9 @@ export const useDeviceStore = create((set, get) => ({
 
   fetchTelemetry: async (id, params = {}) => {
     try {
-      const queryParams = new URLSearchParams(params).toString();
-      const res = await fetch(`http://localhost:8000/api/devices/${id}/telemetry?${queryParams}`);
-      if (!res.ok) throw new Error('Failed to fetch telemetry');
-      const data = await res.json();
-      // Reverse array so chronological order (API returns desc by default)
-      set({ deviceTelemetry: data.reverse() });
+      const res = await api.get(`/devices/${id}/telemetry`, { params });
+      // Reverse array so chronological order
+      set({ deviceTelemetry: res.data.reverse() });
     } catch (err) {
       console.error(err);
     }

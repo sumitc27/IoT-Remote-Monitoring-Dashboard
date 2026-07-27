@@ -11,7 +11,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.device import Device
+from app.models.user import User
 from app.schemas.device import DeviceCreate, DeviceResponse, DeviceSummary, DeviceUpdate
+from app.utils.deps import get_current_user
 
 router = APIRouter(prefix="/api/devices", tags=["Devices"])
 
@@ -20,6 +22,7 @@ router = APIRouter(prefix="/api/devices", tags=["Devices"])
 async def list_devices(
     online_only: Optional[bool] = Query(None, description="Filter by online status"),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """List all registered devices with optional online filter."""
     query = select(Device).order_by(Device.created_at.desc())
@@ -33,7 +36,10 @@ async def list_devices(
 
 
 @router.get("/stats")
-async def device_stats(db: AsyncSession = Depends(get_db)):
+async def device_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Get aggregate device statistics for the dashboard header."""
     total = await db.execute(select(func.count(Device.id)))
     online = await db.execute(
@@ -54,6 +60,7 @@ async def device_stats(db: AsyncSession = Depends(get_db)):
 async def get_device(
     device_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get a single device by ID."""
     result = await db.execute(select(Device).where(Device.id == device_id))
@@ -69,6 +76,7 @@ async def get_device(
 async def create_device(
     payload: DeviceCreate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Register a new device."""
     # Check for duplicate MAC
@@ -92,6 +100,7 @@ async def update_device(
     device_id: uuid.UUID,
     payload: DeviceUpdate,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Update an existing device's configuration."""
     result = await db.execute(select(Device).where(Device.id == device_id))
@@ -113,6 +122,7 @@ async def update_device(
 async def delete_device(
     device_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Delete a device and all its telemetry data."""
     result = await db.execute(select(Device).where(Device.id == device_id))

@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import devices, telemetry
+from app.routers import auth, devices, telemetry
 from app.routers.websocket import manager, router as ws_router
 from app.services.mqtt_service import mqtt_service
 
@@ -66,6 +66,7 @@ app.add_middleware(
 )
 
 # --- Register Routers ---
+app.include_router(auth.router)
 app.include_router(devices.router)
 app.include_router(telemetry.router)
 app.include_router(ws_router)

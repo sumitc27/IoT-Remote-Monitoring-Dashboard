@@ -1,8 +1,8 @@
-import { Battery, Zap, Clock, MapPin } from 'lucide-react';
+import { Battery, Zap, Clock, MapPin, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
-export const DeviceCard = ({ device }) => {
+export const DeviceCard = ({ device, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const isOnline = device.is_online;
   const statusColor = isOnline ? 'var(--status-green)' : 'var(--status-gray)';
@@ -58,12 +58,28 @@ export const DeviceCard = ({ device }) => {
           </div>
         </div>
         
-        {/* Status Indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span className={`status-dot ${isOnline ? 'online' : 'offline'}`} />
-          <span style={{ fontSize: '12px', fontWeight: '600', color: statusColor }}>
-            {isOnline ? 'ONLINE' : 'OFFLINE'}
-          </span>
+        {/* Status Indicator and Actions */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className={`status-dot ${isOnline ? 'online' : 'offline'}`} />
+            <span style={{ fontSize: '12px', fontWeight: '600', color: statusColor }}>
+              {isOnline ? 'ONLINE' : 'OFFLINE'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+            >
+              <Edit size={16} />
+            </button>
+            <button 
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--status-red)' }}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
