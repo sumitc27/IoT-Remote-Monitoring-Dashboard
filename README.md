@@ -32,54 +32,44 @@ ESP32 Nodes → EMQX (MQTT/TLS) → FastAPI Backend → React Dashboard
 └── docs/            # Documentation & archived prototypes
 ```
 
-## 🚀 Quick Start
+## 🚀 Deployment
 
 ### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for TimescaleDB)
-- [Python 3.11+](https://www.python.org/) (for backend)
-- [Node.js 18+](https://nodejs.org/) (for frontend)
+- [Docker & Docker Compose](https://www.docker.com/products/docker-desktop/)
 
-### 1. Clone & Setup Environment
-
+### 1. Setup Environment
 ```bash
 git clone <your-repo-url>
 cd IoT-Remote-Monitoring-Dashboard
-cp .env.example .env
-# Edit .env with your MQTT credentials
+cp .env.production.example .env
+# Edit .env with your secure credentials
 ```
 
-### 2. Start Database
-
+### 2. Deploy Full Stack
 ```bash
-docker compose up -d
+docker-compose up -d --build
 ```
+This single command spins up:
+- TimescaleDB (Port 5433 mapped locally)
+- FastAPI Backend (Internal)
+- React Frontend (Internal)
+- Nginx Reverse Proxy (Port 80)
 
-### 3. Run Backend
+The application will be accessible at `http://localhost`. API docs at `http://localhost/docs`.
 
+### Development Setup
+For local development without Dockerizing the app code (running just the database):
 ```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # macOS/Linux
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+docker-compose up -d timescaledb
+# Run backend locally
+cd backend && pip install -r requirements.txt && uvicorn app.main:app --reload
+# Run frontend locally
+cd frontend && npm install && npm run dev
 ```
-
-API docs available at: http://localhost:8000/docs
-
-### 4. Run Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Dashboard available at: http://localhost:5173
 
 ## 📊 Current Version
 
-**v0.1-scaffold** — Project scaffolding and monorepo structure.
+**v1.0-production** — Production-ready deployment with Docker, Nginx, and full alerting engine.
 
 ## 📝 License
 

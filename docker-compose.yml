@@ -1,13 +1,16 @@
 # ====================================
-# IoT Remote Monitoring Dashboard — Docker Compose
+# IoT Remote Monitoring Dashboard — Production Stack
 # ====================================
-# Development stack: TimescaleDB (PostgreSQL with time-series extension)
-#
+# 
 # Usage:
-#   docker compose up -d        → Start database
-#   docker compose down         → Stop database
-#   docker compose down -v      → Stop and remove data volumes
-
+#   docker-compose up -d --build
+#
+# Services:
+# - timescaledb: PostgreSQL + Time-Series extension
+# - backend: FastAPI Python application (uvicorn)
+# - frontend: React/Vite build
+# - nginx: Reverse proxy for routing traffic to frontend and backend
+# ====================================
 
 services:
   # --- TimescaleDB (PostgreSQL + Time-Series) ---
@@ -29,7 +32,62 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - iot-network
+
+  # --- FastAPI Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: iotdash-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-iotdash}:${POSTGRES_PASSWORD:-iotdash_dev}@timescaledb:5432/${POSTGRES_DB:-iotdash_db}
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - iot-network
+
+  # --- React Frontend ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: iotdash-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - iot-network
+
+  # --- Nginx Reverse Proxy ---
+  nginx:
+    image: nginx:alpine
+    container_name: iotdash-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - iot-network
 
 volumes:
   timescaledb_data:
     driver: local
+
+networks:
+  iot-network:
+    driver: bridge
