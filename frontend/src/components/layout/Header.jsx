@@ -1,4 +1,5 @@
 import { useDeviceStore } from '../../store/deviceStore';
+import { AlertBell } from '../alerts/AlertBell';
 import { Wifi, WifiOff } from 'lucide-react';
 
 export const Header = () => {
@@ -13,19 +14,25 @@ export const Header = () => {
         </p>
       </div>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '8px 16px',
-        borderRadius: '20px',
-        background: wsConnected ? 'var(--status-green-bg)' : 'var(--status-red-bg)',
-        color: wsConnected ? 'var(--status-green)' : 'var(--status-red)',
-        fontSize: '14px',
-        fontWeight: '600'
-      }}>
-        {wsConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
-        {wsConnected ? 'Live' : 'Disconnected'}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Alert Bell */}
+        <AlertBell />
+
+        {/* Connection Status Badge */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          background: wsConnected ? 'var(--status-green-bg)' : 'var(--status-red-bg)',
+          color: wsConnected ? 'var(--status-green)' : 'var(--status-red)',
+          fontSize: '14px',
+          fontWeight: '600'
+        }}>
+          {wsConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
+          {wsConnected ? 'Live' : 'Disconnected'}
+        </div>
       </div>
     </header>
   );

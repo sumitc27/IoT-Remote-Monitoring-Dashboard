@@ -61,6 +61,44 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 
 -- =====================
+-- Alert Rules
+-- =====================
+CREATE TABLE IF NOT EXISTS alert_rules (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id   UUID NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    metric      VARCHAR(50) NOT NULL,
+    operator    VARCHAR(5) NOT NULL,
+    threshold   DOUBLE PRECISION NOT NULL,
+    severity    VARCHAR(20) DEFAULT 'warning',
+    enabled     BOOLEAN DEFAULT TRUE,
+    created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_alert_rules_device ON alert_rules(device_id);
+CREATE INDEX IF NOT EXISTS idx_alert_rules_enabled ON alert_rules(enabled);
+
+-- =====================
+-- Alert Events
+-- =====================
+CREATE TABLE IF NOT EXISTS alert_events (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    rule_id      UUID NOT NULL REFERENCES alert_rules(id) ON DELETE CASCADE,
+    device_id    UUID NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    metric       VARCHAR(50) NOT NULL,
+    value        DOUBLE PRECISION NOT NULL,
+    severity     VARCHAR(20) NOT NULL,
+    message      TEXT,
+    acknowledged BOOLEAN DEFAULT FALSE,
+    triggered_at TIMESTAMPTZ DEFAULT NOW(),
+    resolved_at  TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_alert_events_device ON alert_events(device_id, triggered_at DESC);
+CREATE INDEX IF NOT EXISTS idx_alert_events_rule ON alert_events(rule_id);
+CREATE INDEX IF NOT EXISTS idx_alert_events_severity ON alert_events(severity);
+CREATE INDEX IF NOT EXISTS idx_alert_events_acknowledged ON alert_events(acknowledged);
+
+-- =====================
 -- Seed default admin user
 -- Password: admin123 (bcrypt hash)
 -- =====================

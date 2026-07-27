@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     # --- CORS ---
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
+    # --- Device Offline Detection ---
+    DEVICE_OFFLINE_TIMEOUT: int = 120  # Seconds without data before marking offline
+    DEVICE_OFFLINE_CHECK_INTERVAL: int = 30  # How often to check for offline devices
+
     model_config = {
         "env_file": "../.env",
         "env_file_encoding": "utf-8",

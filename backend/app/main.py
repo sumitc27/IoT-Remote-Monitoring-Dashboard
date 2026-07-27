@@ -11,9 +11,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import auth, devices, telemetry
+from app.routers import auth, devices, telemetry, alerts
 from app.routers.websocket import manager, router as ws_router
 from app.services.mqtt_service import mqtt_service
+from app.services.alert_service import alert_service
 
 # Configure logging
 logging.basicConfig(
@@ -33,6 +34,9 @@ async def lifespan(app: FastAPI):
     # Connect MQTT service to WebSocket broadcast
     mqtt_service.set_broadcast_callback(manager.broadcast)
 
+    # Connect alert service to WebSocket broadcast
+    alert_service.set_broadcast_callback(manager.broadcast)
+
     # Start MQTT subscriber background task
     if settings.MQTT_USERNAME:
         await mqtt_service.start()
@@ -40,10 +44,15 @@ async def lifespan(app: FastAPI):
     else:
         logger.warning("⚠️  MQTT credentials not configured — subscriber not started")
 
+    # Start device offline detection
+    await alert_service.start_offline_detection()
+    logger.info("🔔 Alert service & offline detection started")
+
     yield
 
     # --- Shutdown ---
     logger.info(f"👋 {settings.APP_NAME} shutting down...")
+    await alert_service.stop_offline_detection()
     await mqtt_service.stop()
 
 
@@ -69,6 +78,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(devices.router)
 app.include_router(telemetry.router)
+app.include_router(alerts.router)
 app.include_router(ws_router)
 
 

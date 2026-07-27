@@ -25,6 +25,7 @@ from app.database import async_session
 from app.models.device import Device
 from app.models.telemetry import Telemetry
 from app.schemas.telemetry import TelemetryPayload
+from app.services.alert_service import alert_service
 
 logger = logging.getLogger(__name__)
 
@@ -144,6 +145,14 @@ class MQTTService:
 
             # Store telemetry
             await self._store_telemetry(session, device.id, telemetry_data, now)
+
+            # Evaluate alert rules against incoming telemetry
+            await alert_service.evaluate_telemetry(
+                session=session,
+                device_id=device.id,
+                device_name=device.name or f"Device-{mac_address[-6:]}",
+                telemetry_data=telemetry_data.model_dump(exclude_none=True),
+            )
 
             await session.commit()
 

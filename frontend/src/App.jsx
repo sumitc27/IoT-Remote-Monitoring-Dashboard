@@ -4,6 +4,8 @@ import { DeviceGrid } from './components/dashboard/DeviceGrid';
 import { DeviceDetail } from './components/device/DeviceDetail';
 import { LoginPage } from './components/auth/LoginPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AlertRulesPage } from './components/alerts/AlertRulesPage';
+import { ToastContainer } from './components/alerts/Toast';
 import './index.css';
 
 function App() {
@@ -19,8 +21,10 @@ function App() {
                 <Routes>
                   <Route path="/" element={<DeviceGrid />} />
                   <Route path="/device/:id" element={<DeviceDetail />} />
+                  <Route path="/alerts" element={<AlertRulesPage />} />
                 </Routes>
               </AppLayout>
+              <ToastContainer />
             </ProtectedRoute>
           } 
         />

@@ -1,15 +1,38 @@
-import { Activity, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { Activity, LayoutDashboard, Bell, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { useNavigate } from 'react-router-dom';
+import { useAlertStore } from '../../store/alertStore';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Sidebar = () => {
   const { logout, user } = useAuthStore();
+  const { unreadCount } = useAlertStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const isActive = (path) => location.pathname === path;
+
+  const navLinkStyle = (path) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px 16px',
+    borderRadius: '12px',
+    background: isActive(path) ? 'var(--status-green-bg)' : 'transparent',
+    color: isActive(path) ? 'var(--status-green)' : 'var(--text-secondary)',
+    textDecoration: 'none',
+    fontWeight: isActive(path) ? '600' : '500',
+    cursor: 'pointer',
+    border: 'none',
+    width: '100%',
+    textAlign: 'left',
+    fontSize: '14px',
+    transition: 'all 0.2s ease',
+  });
 
   return (
     <aside className="sidebar">
@@ -30,33 +53,33 @@ export const Sidebar = () => {
       </div>
 
       <nav style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <a href="#" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          background: 'var(--status-green-bg)',
-          color: 'var(--status-green)',
-          textDecoration: 'none',
-          fontWeight: '600'
-        }}>
+        <button onClick={() => navigate('/')} style={navLinkStyle('/')}>
           <LayoutDashboard size={20} />
           Dashboard
-        </a>
-        <a href="#" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          color: 'var(--text-secondary)',
-          textDecoration: 'none',
-          fontWeight: '500'
-        }}>
+        </button>
+        <button onClick={() => navigate('/alerts')} style={navLinkStyle('/alerts')}>
+          <Bell size={20} />
+          Alerts
+          {unreadCount > 0 && (
+            <span style={{
+              marginLeft: 'auto',
+              background: 'var(--status-red)',
+              color: 'white',
+              fontSize: '11px',
+              fontWeight: '700',
+              padding: '2px 8px',
+              borderRadius: '10px',
+              minWidth: '20px',
+              textAlign: 'center',
+            }}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </button>
+        <button onClick={() => {}} style={navLinkStyle('/settings')}>
           <Settings size={20} />
           Settings
-        </a>
+        </button>
       </nav>
 
       <div style={{ marginTop: 'auto', padding: '16px', borderTop: '1px solid rgba(0,0,0,0.05)' }}>

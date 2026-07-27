@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useDeviceStore } from '../store/deviceStore';
+import { useAlertStore } from '../store/alertStore';
 
 export const useWebSocket = (url = 'ws://localhost:8000/ws/telemetry') => {
   const ws = useRef(null);
   const { setWsStatus, updateDeviceTelemetry } = useDeviceStore();
+  const { addRealtimeAlert } = useAlertStore();
 
   useEffect(() => {
     const connect = () => {
@@ -31,6 +33,15 @@ export const useWebSocket = (url = 'ws://localhost:8000/ws/telemetry') => {
           const data = JSON.parse(event.data);
           if (data.type === 'telemetry') {
             updateDeviceTelemetry(data);
+          } else if (data.type === 'alert') {
+            // Real-time alert from the backend
+            addRealtimeAlert(data);
+          } else if (data.type === 'device_offline') {
+            // Device went offline — update the device store
+            updateDeviceTelemetry({
+              ...data,
+              is_online: false,
+            });
           }
         } catch (err) {
           console.error('Error parsing WS message:', err);
@@ -45,5 +56,5 @@ export const useWebSocket = (url = 'ws://localhost:8000/ws/telemetry') => {
         ws.current.close();
       }
     };
-  }, [url, setWsStatus, updateDeviceTelemetry]);
+  }, [url, setWsStatus, updateDeviceTelemetry, addRealtimeAlert]);
 };
