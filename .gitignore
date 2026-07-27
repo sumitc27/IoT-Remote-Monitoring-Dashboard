@@ -1,0 +1,68 @@
+# ===========================
+# Insys IoT Dashboard .gitignore
+# ===========================
+
+# ---------- Environment ----------
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ---------- Python / Backend ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+*.whl
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# ---------- Node / Frontend ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+.vite/
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Docker ----------
+docker-compose.override.yml
+
+# ---------- OS ----------
+*.log
+*.tmp
+*.bak
+*.orig
+
+# ---------- Arduino / PlatformIO ----------
+.pio/
+.pioenvs/
+.piolibdeps/
