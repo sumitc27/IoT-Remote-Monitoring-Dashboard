@@ -1,7 +1,9 @@
 import { Battery, Zap, Clock, MapPin } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 export const DeviceCard = ({ device }) => {
+  const navigate = useNavigate();
   const isOnline = device.is_online;
   const statusColor = isOnline ? 'var(--status-green)' : 'var(--status-gray)';
   
@@ -26,7 +28,11 @@ export const DeviceCard = ({ device }) => {
   const bat2Percent = getBatteryPercent(device.battery_2_voltage);
 
   return (
-    <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
+    <div 
+      className="card" 
+      onClick={() => navigate(`/device/${device.id}`)}
+      style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+    >
       {/* Top Accent Line */}
       <div style={{
         position: 'absolute',
