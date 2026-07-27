@@ -4,30 +4,47 @@ IoT Remote Monitoring Dashboard — FastAPI Application Entry Point
 Registers routers, CORS middleware, and startup/shutdown events.
 """
 
+import logging
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.routers import devices, telemetry
+from app.routers.websocket import manager, router as ws_router
+from app.services.mqtt_service import mqtt_service
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG if settings.DEBUG else logging.INFO,
+    format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan — startup and shutdown events."""
     # --- Startup ---
-    print(f"🚀 {settings.APP_NAME} v{settings.APP_VERSION} starting...")
-    print(f"📡 MQTT Broker: {settings.MQTT_BROKER_HOST}:{settings.MQTT_BROKER_PORT}")
-    print(f"🗄️  Database: {settings.DATABASE_URL.split('@')[-1] if '@' in settings.DATABASE_URL else 'configured'}")
+    logger.info(f"🚀 {settings.APP_NAME} v{settings.APP_VERSION} starting...")
+    logger.info(f"📡 MQTT Broker: {settings.MQTT_BROKER_HOST}:{settings.MQTT_BROKER_PORT}")
 
-    # TODO (Phase 1): Initialize database connection pool
-    # TODO (Phase 1): Start MQTT subscriber background task
+    # Connect MQTT service to WebSocket broadcast
+    mqtt_service.set_broadcast_callback(manager.broadcast)
+
+    # Start MQTT subscriber background task
+    if settings.MQTT_USERNAME:
+        await mqtt_service.start()
+        logger.info("📡 MQTT subscriber started")
+    else:
+        logger.warning("⚠️  MQTT credentials not configured — subscriber not started")
 
     yield
 
     # --- Shutdown ---
-    print(f"👋 {settings.APP_NAME} shutting down...")
-    # TODO (Phase 1): Close database connections
-    # TODO (Phase 1): Disconnect MQTT client
+    logger.info(f"👋 {settings.APP_NAME} shutting down...")
+    await mqtt_service.stop()
 
 
 app = FastAPI(
@@ -48,6 +65,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Register Routers ---
+app.include_router(devices.router)
+app.include_router(telemetry.router)
+app.include_router(ws_router)
+
 
 # --- Health Check ---
 @app.get("/health", tags=["System"])
@@ -57,6 +79,8 @@ async def health_check():
         "status": "ok",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
+        "mqtt_connected": mqtt_service._running,
+        "websocket_clients": manager.client_count,
     }
 
 
@@ -69,11 +93,3 @@ async def root():
         "version": settings.APP_VERSION,
         "docs": "/docs",
     }
-
-
-# TODO (Phase 1): Include routers
-# from app.routers import devices, telemetry, auth, websocket
-# app.include_router(devices.router, prefix="/api", tags=["Devices"])
-# app.include_router(telemetry.router, prefix="/api", tags=["Telemetry"])
-# app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-# app.include_router(websocket.router, tags=["WebSocket"])
