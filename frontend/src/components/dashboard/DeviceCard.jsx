@@ -1,8 +1,8 @@
-import { Battery, Zap, Clock, MapPin, Edit, Trash2 } from 'lucide-react';
+import { Battery, Zap, Clock, MapPin, Edit, Trash2, Train, Power, Timer, Activity } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
-export const DeviceCard = ({ device, onEdit, onDelete }) => {
+export const DeviceCard = ({ device, onEdit, onDelete, hideActions }) => {
   const navigate = useNavigate();
   const isOnline = device.is_online;
   const statusColor = isOnline ? 'var(--status-green)' : 'var(--status-gray)';
@@ -47,15 +47,15 @@ export const DeviceCard = ({ device, onEdit, onDelete }) => {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
         <div>
-          <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 4px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>
+            <Train size={18} />
+            <span>{device.train_no ? `Train: ${device.train_no}` : 'No Train'}</span>
+            <span style={{ margin: '0 4px', color: 'var(--text-muted)' }}>•</span>
+            <span>{device.coach_no ? `Coach: ${device.coach_no}` : 'No Coach'}</span>
+          </div>
+          <h3 style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-secondary)', margin: '0' }}>
             {device.name || 'Unnamed Device'}
           </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '12px' }}>
-            <MapPin size={12} />
-            <span>{device.location || 'Unknown Location'}</span>
-            <span style={{ margin: '0 4px' }}>•</span>
-            <span style={{ fontFamily: 'monospace' }}>{device.mac_address}</span>
-          </div>
         </div>
         
         {/* Status Indicator and Actions */}
@@ -66,20 +66,22 @@ export const DeviceCard = ({ device, onEdit, onDelete }) => {
               {isOnline ? 'ONLINE' : 'OFFLINE'}
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button 
-              onClick={(e) => { e.stopPropagation(); onEdit(); }}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
-            >
-              <Edit size={16} />
-            </button>
-            <button 
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--status-red)' }}
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
+          {!hideActions && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+              >
+                <Edit size={16} />
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--status-red)' }}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -116,31 +118,60 @@ export const DeviceCard = ({ device, onEdit, onDelete }) => {
           )}
         </div>
 
-        {/* AC 1 */}
+
+        {/* Main MCB */}
         <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '8px' }}>
-            <Zap size={14} /> Mains 1
+            <Power size={14} /> Main MCB
           </div>
           <div style={{ 
             fontSize: '14px', 
             fontWeight: '600',
-            color: device.ac_1_status === 'ON' ? 'var(--status-green)' : (device.ac_1_status === 'OFF' ? 'var(--status-red)' : 'inherit')
+            color: device.main_mcb_status === 'ON' ? 'var(--status-green)' : (device.main_mcb_status === 'OFF' ? 'var(--status-red)' : 'inherit')
           }}>
-            {device.ac_1_status || '--'}
+            {device.main_mcb_status || '--'}
           </div>
         </div>
 
-        {/* AC 2 */}
+        {/* FSDC MCB */}
         <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '8px' }}>
-            <Zap size={14} /> Mains 2
+            <Power size={14} /> FSDC MCB
           </div>
           <div style={{ 
             fontSize: '14px', 
             fontWeight: '600',
-            color: device.ac_2_status === 'ON' ? 'var(--status-green)' : (device.ac_2_status === 'OFF' ? 'var(--status-red)' : 'inherit')
+            color: device.fsds_mcb_status === 'ON' ? 'var(--status-green)' : (device.fsds_mcb_status === 'OFF' ? 'var(--status-red)' : 'inherit')
           }}>
-            {device.ac_2_status || '--'}
+            {device.fsds_mcb_status || '--'}
+          </div>
+        </div>
+
+        {/* Battery Status */}
+        <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '8px' }}>
+            <Activity size={14} /> Battery Status
+          </div>
+          <div style={{ 
+            fontSize: '14px', 
+            fontWeight: '600',
+            color: device.battery_status === 'Charging' ? 'var(--status-green)' : 'inherit'
+          }}>
+            {device.battery_status || '--'}
+          </div>
+        </div>
+
+        {/* Countdown Timer */}
+        <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '8px' }}>
+            <Timer size={14} /> Countdown
+          </div>
+          <div style={{ 
+            fontSize: '18px', 
+            fontWeight: '700',
+            color: 'var(--status-red)'
+          }}>
+            {device.countdown_timer !== undefined && device.countdown_timer !== null ? `${device.countdown_timer}s` : '--'}
           </div>
         </div>
 

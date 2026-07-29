@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import api from '../../utils/api';
 import { useDeviceStore } from '../../store/deviceStore';
 
-export const DeviceModal = ({ isOpen, onClose, device = null }) => {
+export const DeviceModal = ({ isOpen, onClose, device = null, initialData = null }) => {
   const { fetchDevices } = useDeviceStore();
   const isEditing = !!device;
 
@@ -12,6 +12,8 @@ export const DeviceModal = ({ isOpen, onClose, device = null }) => {
     name: '',
     device_type: '',
     location: '',
+    train_no: '',
+    coach_no: '',
     description: '',
     firmware_ver: '',
   });
@@ -25,6 +27,8 @@ export const DeviceModal = ({ isOpen, onClose, device = null }) => {
         name: device.name || '',
         device_type: device.device_type || '',
         location: device.location || '',
+        train_no: device.train_no || '',
+        coach_no: device.coach_no || '',
         description: device.description || '',
         firmware_ver: device.firmware_ver || '',
       });
@@ -34,11 +38,13 @@ export const DeviceModal = ({ isOpen, onClose, device = null }) => {
         name: '',
         device_type: '',
         location: '',
+        train_no: initialData?.train_no || '',
+        coach_no: initialData?.coach_no || '',
         description: '',
         firmware_ver: '',
       });
     }
-  }, [device, isOpen]);
+  }, [device, initialData, isOpen]);
 
   if (!isOpen) return null;
 
@@ -57,7 +63,19 @@ export const DeviceModal = ({ isOpen, onClose, device = null }) => {
       await fetchDevices();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'An error occurred');
+      let errorMsg = 'An error occurred';
+      if (err.response?.data?.detail) {
+        if (Array.isArray(err.response.data.detail)) {
+          errorMsg = err.response.data.detail.map(d => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(', ');
+        } else if (typeof err.response.data.detail === 'string') {
+          errorMsg = err.response.data.detail;
+        } else {
+          errorMsg = JSON.stringify(err.response.data.detail);
+        }
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -137,6 +155,31 @@ export const DeviceModal = ({ isOpen, onClose, device = null }) => {
                 value={formData.location} 
                 onChange={handleChange} 
                 placeholder="e.g. Server Room A"
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Train No</label>
+              <input 
+                type="text" 
+                name="train_no"
+                value={formData.train_no} 
+                onChange={handleChange} 
+                placeholder="e.g. 12345"
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Coach No</label>
+              <input 
+                type="text" 
+                name="coach_no"
+                value={formData.coach_no} 
+                onChange={handleChange} 
+                placeholder="e.g. B1"
                 style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               />
             </div>

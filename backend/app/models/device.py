@@ -26,6 +26,8 @@ class Device(Base):
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     device_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
     location: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    train_no: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    coach_no: Mapped[str | None] = mapped_column(String(50), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     firmware_ver: Mapped[str | None] = mapped_column(String(50), nullable=True)
     is_online: Mapped[bool] = mapped_column(Boolean, default=False)

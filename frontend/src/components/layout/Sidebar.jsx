@@ -1,4 +1,4 @@
-import { Activity, LayoutDashboard, Bell, Settings, LogOut } from 'lucide-react';
+import { Activity, LayoutDashboard, Bell, Settings, LogOut, Database } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useAlertStore } from '../../store/alertStore';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -56,6 +56,10 @@ export const Sidebar = () => {
         <button onClick={() => navigate('/')} style={navLinkStyle('/')}>
           <LayoutDashboard size={20} />
           Dashboard
+        </button>
+        <button onClick={() => navigate('/manage-devices')} style={navLinkStyle('/manage-devices')}>
+          <Database size={20} />
+          Manage Devices
         </button>
         <button onClick={() => navigate('/alerts')} style={navLinkStyle('/alerts')}>
           <Bell size={20} />

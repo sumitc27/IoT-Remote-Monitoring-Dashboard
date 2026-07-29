@@ -19,6 +19,8 @@ class DeviceResponse(BaseModel):
     name: Optional[str] = None
     device_type: Optional[str] = None
     location: Optional[str] = None
+    train_no: Optional[str] = None
+    coach_no: Optional[str] = None
     description: Optional[str] = None
     firmware_ver: Optional[str] = None
     is_online: bool = False
@@ -37,6 +39,8 @@ class DeviceSummary(BaseModel):
     name: Optional[str] = None
     device_type: Optional[str] = None
     location: Optional[str] = None
+    train_no: Optional[str] = None
+    coach_no: Optional[str] = None
     is_online: bool = False
     last_seen: Optional[datetime] = None
 
@@ -52,6 +56,8 @@ class DeviceCreate(BaseModel):
     name: Optional[str] = Field(None, max_length=255)
     device_type: Optional[str] = Field(None, max_length=100)
     location: Optional[str] = Field(None, max_length=255)
+    train_no: Optional[str] = Field(None, max_length=50)
+    coach_no: Optional[str] = Field(None, max_length=50)
     description: Optional[str] = None
     firmware_ver: Optional[str] = Field(None, max_length=50)
 
@@ -62,5 +68,7 @@ class DeviceUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=255)
     device_type: Optional[str] = Field(None, max_length=100)
     location: Optional[str] = Field(None, max_length=255)
+    train_no: Optional[str] = Field(None, max_length=50)
+    coach_no: Optional[str] = Field(None, max_length=50)
     description: Optional[str] = None
     firmware_ver: Optional[str] = Field(None, max_length=50)

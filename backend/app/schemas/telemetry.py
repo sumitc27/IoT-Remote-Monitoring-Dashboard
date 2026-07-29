@@ -16,6 +16,10 @@ class TelemetryPayload(BaseModel):
     battery_2_voltage: Optional[float] = None
     ac_1_status: Optional[str] = None
     ac_2_status: Optional[str] = None
+    main_mcb_status: Optional[str] = None
+    fsds_mcb_status: Optional[str] = None
+    battery_status: Optional[str] = None
+    countdown_timer: Optional[int] = None
 
 
 class TelemetryResponse(BaseModel):
@@ -27,6 +31,10 @@ class TelemetryResponse(BaseModel):
     battery_2_voltage: Optional[float] = None
     ac_1_status: Optional[str] = None
     ac_2_status: Optional[str] = None
+    main_mcb_status: Optional[str] = None
+    fsds_mcb_status: Optional[str] = None
+    battery_status: Optional[str] = None
+    countdown_timer: Optional[int] = None
 
     model_config = {"from_attributes": True}
 
@@ -52,3 +60,7 @@ class DeviceTelemetrySummary(BaseModel):
     battery_2_voltage: Optional[float] = None
     ac_1_status: Optional[str] = None
     ac_2_status: Optional[str] = None
+    main_mcb_status: Optional[str] = None
+    fsds_mcb_status: Optional[str] = None
+    battery_status: Optional[str] = None
+    countdown_timer: Optional[int] = None

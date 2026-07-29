@@ -219,6 +219,10 @@ class MQTTService:
             battery_2_voltage=data.battery_2_voltage,
             ac_1_status=data.ac_1_status,
             ac_2_status=data.ac_2_status,
+            main_mcb_status=data.main_mcb_status,
+            fsds_mcb_status=data.fsds_mcb_status,
+            battery_status=data.battery_status,
+            countdown_timer=data.countdown_timer,
         )
         session.add(record)
 

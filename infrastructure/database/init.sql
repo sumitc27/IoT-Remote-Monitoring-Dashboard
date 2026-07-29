@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS devices (
     name          VARCHAR(255),
     device_type   VARCHAR(100),
     location      VARCHAR(255),
+    train_no      VARCHAR(50),
+    coach_no      VARCHAR(50),
     description   TEXT,
     firmware_ver  VARCHAR(50),
     is_online     BOOLEAN DEFAULT FALSE,
@@ -38,6 +40,10 @@ CREATE TABLE IF NOT EXISTS telemetry (
     battery_2_voltage  DOUBLE PRECISION,
     ac_1_status        VARCHAR(3),
     ac_2_status        VARCHAR(3),
+    main_mcb_status    VARCHAR(10),
+    fsds_mcb_status    VARCHAR(10),
+    battery_status     VARCHAR(20),
+    countdown_timer    INTEGER,
     PRIMARY KEY (time, device_id)
 );
 

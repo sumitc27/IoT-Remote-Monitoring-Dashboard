@@ -8,7 +8,7 @@ time-series queries, compression, and retention policies.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Float, ForeignKey, String
+from sqlalchemy import DateTime, Float, ForeignKey, String, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -38,6 +38,10 @@ class Telemetry(Base):
     battery_2_voltage: Mapped[float | None] = mapped_column(Float, nullable=True)
     ac_1_status: Mapped[str | None] = mapped_column(String(3), nullable=True)
     ac_2_status: Mapped[str | None] = mapped_column(String(3), nullable=True)
+    main_mcb_status: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    fsds_mcb_status: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    battery_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    countdown_timer: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     def __repr__(self) -> str:
         return f"<Telemetry device={self.device_id} time={self.time}>"
